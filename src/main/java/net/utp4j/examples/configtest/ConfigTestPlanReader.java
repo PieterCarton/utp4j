@@ -55,9 +55,10 @@ public class ConfigTestPlanReader {
 		br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
 		boolean skipLine = true;
 		while ((line = br.readLine()) != null) {
+			System.out.println(line);
 			if (!skipLine) {
 				String[] split = line.split(";");
-				int repetitions = Integer.parseInt(split[split.length - 1]);
+				int repetitions = Integer.parseInt(split[split.length - 1].trim());
 				for (int i = 0; i < repetitions; i++) {
 					testParameters.add(line);				
 				}				

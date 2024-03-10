@@ -39,6 +39,7 @@ public class ConfigTestRead {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		log.debug("waiting to receive test plan...");
 		ConfigTestPlanReader plan = listenForTestPlan();
+		plan.read();
 		log.debug("test plan received! starting benchmark...");
 
 		ByteBuffer buffer = ByteBuffer.allocate(150000000);
@@ -82,7 +83,8 @@ public class ConfigTestRead {
 
 		// read benchmark configuration received from ConfigWriteTest
 		// reset position of buffer
-		testPlanBuffer.position(0);
+//		testPlanBuffer.position(0);
+		testPlanBuffer.flip();
 		return new ConfigTestPlanReader(new ByteArrayInputStream(testPlanBuffer.array()));
 	}
 
