@@ -14,6 +14,7 @@
 */
 package net.utp4j.examples.configtest;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
@@ -62,7 +63,10 @@ public class ConfigTestWrite {
 			ip = args[2];
 		}
 		boolean waitOnManualInput = false;
-		
+
+		// before starting benchmark, inform receiving party of test plan configuration
+		sendTestPlan(testPlan, ip);
+
 		
 		MicroSecondsTimeStamp timeStamper = new MicroSecondsTimeStamp();
 		
@@ -172,6 +176,33 @@ public class ConfigTestWrite {
 		double seconds = (double)(end - start)/1000000d;
 		double sendRate = ((double)bytesToSend/1024d)/seconds;
 		return Math.round(sendRate) + "kB/sec";
+	}
+
+	/* Send test plan configuration to receiving party in benchmark */
+	private static void sendTestPlan(String testPlanLocation, String ip) throws IOException, InterruptedException {
+		// 150kB buffer for test plan
+		ByteBuffer buffer = ByteBuffer.allocate(150000);
+
+		RandomAccessFile file = new RandomAccessFile(testPlanLocation, "rw");
+		FileChannel  fileChannel = file.getChannel();
+
+		int bytesRead = 0;
+		do {
+			bytesRead = fileChannel.read(buffer);
+		} while(bytesRead != -1);
+
+		UtpSocketChannel chanel = UtpSocketChannel.open();
+		int bytesToSend = buffer.position();
+
+		UtpConnectFuture cFuture = chanel.connect(new InetSocketAddress(ip, 13344));
+		cFuture.block();
+		UtpWriteFuture writeFuture = chanel.write(buffer);
+		writeFuture.block();
+
+		file.close();
+		fileChannel.close();
+		chanel.close();
+		buffer.clear();
 	}
 
 

@@ -14,6 +14,7 @@
 */
 package net.utp4j.examples.configtest;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -36,8 +37,13 @@ public class ConfigTestRead {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
+		log.debug("waiting to receive test plan...");
+		ConfigTestPlanReader plan = listenForTestPlan();
+		log.debug("test plan received! starting benchmark...");
+
 		ByteBuffer buffer = ByteBuffer.allocate(150000000);
-		while(true) {
+		while(plan.hasNext()) {
+			plan.next();
 			UtpServerSocketChannel server = UtpServerSocketChannel.open();
 			server.bind(new InetSocketAddress(13344));
 			UtpAcceptFuture acceptFuture = server.accept();
@@ -54,9 +60,30 @@ public class ConfigTestRead {
 			buffer.clear();
 			readFuture = null;
 			acceptFuture = null;
-			Thread.sleep(5000);
+			Thread.sleep(1000);
 		}
 
+	}
+
+	private static ConfigTestPlanReader listenForTestPlan() throws IOException, InterruptedException {
+		// reserve 150kB buffer for testplan
+		ByteBuffer testPlanBuffer = ByteBuffer.allocate(150000);
+
+		// open initial server to receive test configurations
+		UtpServerSocketChannel server = UtpServerSocketChannel.open();
+		server.bind(new InetSocketAddress(13344));
+		UtpAcceptFuture acceptFuture = server.accept();
+		acceptFuture.block();
+		UtpSocketChannel channel = acceptFuture.getChannel();
+		UtpReadFuture readFuture = channel.read(testPlanBuffer);
+		readFuture.block();
+		channel.close();
+		server.close();
+
+		// read benchmark configuration received from ConfigWriteTest
+		// reset position of buffer
+		testPlanBuffer.position(0);
+		return new ConfigTestPlanReader(new ByteArrayInputStream(testPlanBuffer.array()));
 	}
 
 }
