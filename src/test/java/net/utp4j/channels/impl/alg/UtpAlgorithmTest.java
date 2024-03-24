@@ -40,6 +40,7 @@ import net.utp4j.data.SelectiveAckHeaderExtension;
 import net.utp4j.data.UtpHeaderExtension;
 import net.utp4j.data.UtpPacket;
 import net.utp4j.data.UtpPacketUtils;
+import net.utp4j.channels.impl.alg.PacketTestUtil;
 
 @RunWith(org.mockito.runners.MockitoJUnitRunner.class)
 public class UtpAlgorithmTest {
@@ -101,29 +102,29 @@ public class UtpAlgorithmTest {
 		algorithm.setByteBuffer(bufferMock);
 		
 		// Add some packets, 4...14
-		UtpTimestampedPacketDTO pkt = createPacket(3);
+		UtpTimestampedPacketDTO pkt = PacketTestUtil.createPacket(3);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(4);
+		pkt = PacketTestUtil.createPacket(4);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(5);
+		pkt = PacketTestUtil.createPacket(5);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(6);
+		pkt = PacketTestUtil.createPacket(6);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(7);
+		pkt = PacketTestUtil.createPacket(7);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(8);
+		pkt = PacketTestUtil.createPacket(8);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(9);
+		pkt = PacketTestUtil.createPacket(9);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(10);
+		pkt = PacketTestUtil.createPacket(10);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(11);
+		pkt = PacketTestUtil.createPacket(11);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(12);
+		pkt = PacketTestUtil.createPacket(12);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(13);
+		pkt = PacketTestUtil.createPacket(13);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(14);
+		pkt = PacketTestUtil.createPacket(14);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
 		
 		// now 11 unacked packets: 3,...,13,14 
@@ -132,7 +133,7 @@ public class UtpAlgorithmTest {
 		// ACK:5,SACK:7,8,9,10,11,12,13,14 bitpattern: 11111111 -> least significant bit is always ACK+2
 		// in this case its 7. 
 		byte[] selAck = {(byte) 255, (byte) 0, (byte) 0, (byte) 0};
-		UtpTimestampedPacketDTO ackPacket = createSelAckPacket(5, selAck);
+		UtpTimestampedPacketDTO ackPacket = PacketTestUtil.createSelAckPacket(5, selAck);
 		algorithm.ackRecieved(ackPacket);
 		
 		// now 3,4,5 should be removed
@@ -146,7 +147,7 @@ public class UtpAlgorithmTest {
 		assertEquals(6, (UtpPacketUtils.extractUtpPacket(packetsToResend.remove()).getSequenceNumber() & 0xFFFF));
 		
 		// 6 beeing acked now. 
-		UtpTimestampedPacketDTO ack6 = createSelAckPacket(6, null);
+		UtpTimestampedPacketDTO ack6 = PacketTestUtil.createSelAckPacket(6, null);
 		// no extension... 
 		ack6.utpPacket().setFirstExtension((byte) 0);
 		ack6.utpPacket().setExtensions(null);
@@ -165,22 +166,6 @@ public class UtpAlgorithmTest {
 		
 	}
 	
-	private UtpTimestampedPacketDTO createSelAckPacket(int i, byte[] selAck) throws SocketException {
-		UtpTimestampedPacketDTO ack = createPacket(2); 
-		ack.utpPacket().setAckNumber((short) (i & 0xFFFF));
-		
-		SelectiveAckHeaderExtension selAckExtension = new SelectiveAckHeaderExtension();
-		selAckExtension.setBitMask(selAck);
-		selAckExtension.setNextExtension((byte) 0);
-		ack.utpPacket().setFirstExtension(UtpPacketUtils.SELECTIVE_ACK);
-		
-		SelectiveAckHeaderExtension[] extensions = { selAckExtension };
-		ack.utpPacket().setExtensions(extensions);
-		
-		return ack;
-		
-	}
-	
 	@Test
 	public void testResendNoTriggerReduceWindow() throws SocketException {
 		UtpAlgConfiguration.AUTO_ACK_SMALLER_THAN_ACK_NUMBER = true;
@@ -195,15 +180,15 @@ public class UtpAlgorithmTest {
 		ByteBuffer bufferMock = mock(ByteBuffer.class);
 		algorithm.setByteBuffer(bufferMock);
 		
-		UtpTimestampedPacketDTO pkt = createPacket(5);
+		UtpTimestampedPacketDTO pkt = PacketTestUtil.createPacket(5);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(6);
+		pkt = PacketTestUtil.createPacket(6);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(7);
+		pkt = PacketTestUtil.createPacket(7);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(8);
+		pkt = PacketTestUtil.createPacket(8);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
-		pkt = createPacket(9);
+		pkt = PacketTestUtil.createPacket(9);
 		algorithm.markPacketOnfly(pkt.utpPacket(), pkt.dataGram());
 		
 		// packets 5,6,7,8,9 on fly
@@ -213,7 +198,7 @@ public class UtpAlgorithmTest {
 		// should trigger fast resend of 6. 
 		// maxWindow should not be multiplied with 0.5.
 		byte[] selAck = { (byte) 7, 0, 0, 0};
-		UtpTimestampedPacketDTO sack = createSelAckPacket(5, selAck);
+		UtpTimestampedPacketDTO sack = PacketTestUtil.createSelAckPacket(5, selAck);
 		algorithm.ackRecieved(sack);		
 		algorithm.setMaxWindow(maxWindow);
 		
@@ -238,11 +223,11 @@ public class UtpAlgorithmTest {
 		algorithm.setMaxWindow(packetLength*10);
 		
 		// mark 5 packets on fly, will be ~5100 bytes of currentWindow
-		UtpTimestampedPacketDTO pkt5 = createPacket(5, packetLength);
-		UtpTimestampedPacketDTO pkt6 = createPacket(6, packetLength);
-		UtpTimestampedPacketDTO pkt7 = createPacket(7, packetLength);
-		UtpTimestampedPacketDTO pkt8 = createPacket(8, packetLength);
-		UtpTimestampedPacketDTO pkt9 = createPacket(9, packetLength);
+		UtpTimestampedPacketDTO pkt5 = PacketTestUtil.createPacket(5, packetLength);
+		UtpTimestampedPacketDTO pkt6 = PacketTestUtil.createPacket(6, packetLength);
+		UtpTimestampedPacketDTO pkt7 = PacketTestUtil.createPacket(7, packetLength);
+		UtpTimestampedPacketDTO pkt8 = PacketTestUtil.createPacket(8, packetLength);
+		UtpTimestampedPacketDTO pkt9 = PacketTestUtil.createPacket(9, packetLength);
 
 		algorithm.markPacketOnfly(pkt5.utpPacket(), pkt5.dataGram());
 		algorithm.markPacketOnfly(pkt6.utpPacket(), pkt6.dataGram());
@@ -352,21 +337,4 @@ public class UtpAlgorithmTest {
 		waitingTime = algorithm.getWaitingTimeMicroSeconds();
 		assertEquals(0L, waitingTime);
 	}
-	
-	private UtpTimestampedPacketDTO createPacket(int sequenceNumber, int packetLength) throws SocketException {
-		UtpPacket pkt = new UtpPacket();
-		pkt.setSequenceNumber(longToUshort(sequenceNumber));
-		pkt.setPayload(new byte[packetLength]);
-		SocketAddress addr = new InetSocketAddress(111);
-		DatagramPacket mockDgPkt = new DatagramPacket(pkt.toByteArray(), 1, addr);
-		UtpTimestampedPacketDTO toReturn = new UtpTimestampedPacketDTO(mockDgPkt, pkt, 1L, 0);
-		
-		return toReturn;
-	}
-
-
-	private UtpTimestampedPacketDTO createPacket(int sequenceNumber) throws SocketException {
-		return createPacket(sequenceNumber, 1);
-	}
-	
 }
