@@ -57,7 +57,7 @@ There are a lot of research papers regarding LEDBAT. Because it is still an expe
 
 ##Appreciation 
 I'd like to thank all members of the [Communication Systems Group][csg] at the University Zurich for the opportunity, the provided test hardware, the room and patience.
-Special thanks to Thomas and Danni for all the constructive feedback, advices and tipps. 
+Special thanks to Thomas and Danni for all the constructive feedback, advices and tips. 
 
 ##Contact
 Please report any bugs, issues or suggestions to issues at utp4j dot net.
