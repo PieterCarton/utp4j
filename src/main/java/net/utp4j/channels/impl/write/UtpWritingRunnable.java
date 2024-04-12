@@ -51,6 +51,7 @@ public class UtpWritingRunnable extends Thread implements Runnable {
 	
 	public UtpWritingRunnable(UtpSocketChannelImpl channel, ByteBuffer buffer, 
 			MicroSecondsTimeStamp timeStamper, UtpWriteFutureImpl future) {
+		setName("UtpWritingRunnable");
 		this.buffer = buffer;
 		this.channel = channel;
 		this.timeStamper = timeStamper;
