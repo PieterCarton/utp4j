@@ -21,7 +21,15 @@ dependencies {
 
     testImplementation libs.org.mockito.mockito.core
     testImplementation libs.org.mockito.mockito.junit.jupiter
-    testImplementation libs.org.junit.jupiter.junit.jupiter.api
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
 
 group = 'utp4j'
