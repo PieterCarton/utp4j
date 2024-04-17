@@ -14,8 +14,15 @@
  */
 package net.utp4j.examples.configtest;
 
+import net.utp4j.channels.impl.alg.PacketSizeModus;
+import net.utp4j.channels.impl.alg.UtpAlgConfiguration;
+import net.utp4j.channels.impl.log.UtpDataLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
