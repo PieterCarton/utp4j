@@ -1,5 +1,10 @@
 /bin
 /target
 /codecover
+<<<<<<< HEAD
 /.idea
+=======
+/testData/auto
+.idea
+>>>>>>> d62bad87bf79551d7063e4e636c3c4e11751838a
 utp4j.iml

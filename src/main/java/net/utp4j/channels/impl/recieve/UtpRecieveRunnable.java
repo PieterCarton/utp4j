@@ -41,6 +41,7 @@ public class UtpRecieveRunnable extends Thread implements Runnable {
 	
 
 	public UtpRecieveRunnable(DatagramSocket socket, UtpPacketRecievable queueable) {
+		setName("UtpRecieveRunnable");
 		this.socket = socket;
 		this.packetReciever = queueable;
 	}

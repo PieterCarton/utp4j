@@ -61,6 +61,7 @@ public class UtpReadingRunnable extends Thread implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(UtpReadingRunnable.class);
 	
 	public UtpReadingRunnable(UtpSocketChannelImpl channel, ByteBuffer buff, MicroSecondsTimeStamp timestamp, UtpReadFutureImpl future) {
+		setName("UtpReadingRunnable");
 		this.channel = channel;
 		this.buffer = buff;
 		this.timeStamper = timestamp;

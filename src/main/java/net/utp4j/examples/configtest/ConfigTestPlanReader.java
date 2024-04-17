@@ -14,11 +14,7 @@
 */
 package net.utp4j.examples.configtest;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -35,7 +31,7 @@ import net.utp4j.channels.impl.log.UtpDataLogger;
 
 public class ConfigTestPlanReader {
 
-	private String fileLocation;
+	private InputStream fis;
 	private Deque<String> testParameters = new LinkedList<String>();
 	private int testRun = 0;
 	private String lastParameters;
@@ -43,23 +39,25 @@ public class ConfigTestPlanReader {
 	
 	private static final Logger log = LoggerFactory.getLogger(ConfigTestPlanReader.class);
 
-	public ConfigTestPlanReader(String fileLocation) {
-		this.fileLocation = fileLocation;
+	public ConfigTestPlanReader(String fileLocation) throws FileNotFoundException {
+		this(new FileInputStream(fileLocation));
+	}
+
+	public ConfigTestPlanReader(InputStream inputStream) {
+		this.fis = inputStream;
 		UtpAlgConfiguration.DEBUG = false;
 	}
 	
 	public void read() throws IOException {
-		InputStream fis;
 		BufferedReader br;
 		String line;
 
-		fis = new FileInputStream(fileLocation);
 		br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
 		boolean skipLine = true;
 		while ((line = br.readLine()) != null) {
 			if (!skipLine) {
 				String[] split = line.split(";");
-				int repetitions = Integer.parseInt(split[split.length - 1]);
+				int repetitions = Integer.parseInt(split[split.length - 1].trim());
 				for (int i = 0; i < repetitions; i++) {
 					testParameters.add(line);				
 				}				
@@ -95,6 +93,10 @@ public class ConfigTestPlanReader {
 		UtpAlgConfiguration.MICROSECOND_WAIT_BETWEEN_BURSTS = Integer.parseInt(splitParameters[10]);
 		UtpAlgConfiguration.TIME_WAIT_AFTER_LAST_PACKET = Integer.parseInt(splitParameters[11]);
 		UtpAlgConfiguration.ONLY_POSITIVE_GAIN = toBool(splitParameters[12]);
+		// new exposed UTP algorithm parameters for receiver
+		UtpAlgConfiguration.SKIP_PACKETS_UNTIL_ACK = Integer.parseInt(splitParameters[13]);
+		UtpAlgConfiguration.AUTO_ACK_SMALLER_THAN_ACK_NUMBER = toBool(splitParameters[14]);
+
 		UtpAlgConfiguration.DEBUG = true;
 		return parameters + " -- " + dateString;
 		
