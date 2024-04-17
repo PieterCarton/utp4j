@@ -1,17 +1,17 @@
 /* Copyright 2013 Ivan Iljkic
-*
-* Licensed under the Apache License, Version 2.0 (the "License"); you may not
-* use this file except in compliance with the License. You may obtain a copy of
-* the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-* WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-* License for the specific language governing permissions and limitations under
-* the License.
-*/
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package net.utp4j.examples.configtest;
 
 import java.io.*;
@@ -21,13 +21,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Deque;
 import java.util.LinkedList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import net.utp4j.channels.impl.alg.PacketSizeModus;
-import net.utp4j.channels.impl.alg.UtpAlgConfiguration;
-import net.utp4j.channels.impl.log.UtpDataLogger;
 
 public class ConfigTestPlanReader {
 
@@ -39,7 +32,7 @@ public class ConfigTestPlanReader {
 	
 	private static final Logger log = LoggerFactory.getLogger(ConfigTestPlanReader.class);
 
-	public ConfigTestPlanReader(String fileLocation) throws FileNotFoundException {
+    public ConfigTestPlanReader(String fileLocation) throws FileNotFoundException {
 		this(new FileInputStream(fileLocation));
 	}
 
@@ -47,20 +40,20 @@ public class ConfigTestPlanReader {
 		this.fis = inputStream;
 		UtpAlgConfiguration.DEBUG = false;
 	}
-	
-	public void read() throws IOException {
-		BufferedReader br;
-		String line;
 
-		br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
-		boolean skipLine = true;
-		while ((line = br.readLine()) != null) {
-			if (!skipLine) {
-				String[] split = line.split(";");
-				int repetitions = Integer.parseInt(split[split.length - 1].trim());
+	public void read() throws IOException {
+        BufferedReader br;
+        String line;
+
+        br = new BufferedReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
+        boolean skipLine = true;
+        while ((line = br.readLine()) != null) {
+            if (!skipLine) {
+                String[] split = line.split(";");
+                int repetitions = Integer.parseInt(split[split.length - 1].trim());
 				for (int i = 0; i < repetitions; i++) {
-					testParameters.add(line);				
-				}				
+					testParameters.add(line);
+				}
 			} else {
 				skipLine = false;
 			}
@@ -69,7 +62,7 @@ public class ConfigTestPlanReader {
 		br = null;
 		fis = null;
 	}
-	
+
 	public String next() {
 		testRun++;
 		Date date = new Date();
@@ -99,27 +92,27 @@ public class ConfigTestPlanReader {
 
 		UtpAlgConfiguration.DEBUG = true;
 		return parameters + " -- " + dateString;
-		
+
 	}
-	
+
 	private PacketSizeModus parsePktSizeMode(String strg) {
 		if ("DYNAMIC_LINEAR".equals(strg)) return PacketSizeModus.DYNAMIC_LINEAR;
 		else if ("CONSTANT_1472".equals(strg)) return PacketSizeModus.CONSTANT_1472;
 		else if ("CONSANT_576".equals(strg)) return PacketSizeModus.CONSTANT_576;
 		return null;
 	}
-	
+
 	private boolean toBool(String strg) {
 		return "1".equals(strg);
 	}
-	
+
 	public boolean hasNext() {
-		return !testParameters.isEmpty();
-	}
-	public void failed() {
-		if (lastParameters != null) {
-			testParameters.addFirst(lastParameters);			
-			testRun--;
-		}
-	}
+		return !testParameters.isEmpty();}
+
+    public void failed() {
+        if (lastParameters != null) {
+            testParameters.addFirst(lastParameters);
+            testRun--;
+        }
+    }
 }
