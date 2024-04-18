@@ -41,6 +41,10 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+compileJava {
+    options.release = 17
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
