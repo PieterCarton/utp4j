@@ -30,7 +30,7 @@ class LatencyFactorTest {
         when(stamper.timeStamp()).thenReturn(0L); // returns 1s
         UtpAlgorithm algorithm = new UtpAlgorithm(stamper, new InetSocketAddress(51235));
         algorithm.setEstimatedRtt(100);
-        ByteBuffer bufferMock = mock(ByteBuffer.class);
+        ByteBuffer bufferMock = ByteBuffer.allocate(10000);
         algorithm.setByteBuffer(bufferMock);
 
         OutPacketBuffer outBuffer = mock(OutPacketBuffer.class);
@@ -105,7 +105,7 @@ class LatencyFactorTest {
         when(stamper.timeStamp()).thenReturn(0L); // returns 1s
         UtpAlgorithm algorithm = new UtpAlgorithm(stamper, new InetSocketAddress(51235));
         algorithm.setEstimatedRtt(100);
-        ByteBuffer bufferMock = mock(ByteBuffer.class);
+        ByteBuffer bufferMock = ByteBuffer.allocate(10000);
         algorithm.setByteBuffer(bufferMock);
 
         OutPacketBuffer outBuffer = mock(OutPacketBuffer.class);
@@ -189,7 +189,7 @@ class LatencyFactorTest {
         when(stamper.timeStamp()).thenReturn(0L); // returns 1s
         UtpAlgorithm algorithm = new UtpAlgorithm(stamper, new InetSocketAddress(51235));
         algorithm.setEstimatedRtt(100);
-        ByteBuffer bufferMock = mock(ByteBuffer.class);
+        ByteBuffer bufferMock = ByteBuffer.allocate(10000);
         algorithm.setByteBuffer(bufferMock);
 
         OutPacketBuffer outBuffer = mock(OutPacketBuffer.class);
