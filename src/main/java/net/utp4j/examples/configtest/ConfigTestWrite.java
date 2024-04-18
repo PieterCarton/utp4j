@@ -34,27 +34,34 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ConfigTestWrite {
-    private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	private static 	ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-    private static FileChannel fChannel;
-    private static RandomAccessFile aFile;
-    private static final long CPU_LOAD_CHECK_INTERVALL_MILLIS = 50;
-    private static final NumberFormat percentFormat = NumberFormat.getPercentInstance(Locale.US);
+	private static FileChannel fChannel;
+	private static String logFileLocation;
+	private static RandomAccessFile aFile;
+	private static long CPU_LOAD_CHECK_INTERVALL_MILLIS = 50;
+	private static NumberFormat percentFormat = NumberFormat.getPercentInstance(Locale.US);
 
-    private static final Logger log = LoggerFactory.getLogger(ConfigTestWrite.class);
+	private static final Logger log = LoggerFactory.getLogger(ConfigTestWrite.class);
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-if (args.length < 2) {
-			System.out.println("Error - usage: configwritetest <path/to/testplan> <path/to/testfile> [server ip:port]");
+	/**
+	 * @param args
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public static void main(String[] args) throws IOException, InterruptedException {
+		if (args.length < 3) {
+			System.out.println("Error - usage: configwritetest <path/to/testplan> <path/to/testfile> <path/to/log> [server ip:port]");
 			return;
 		}
 
 
 		String testPlan = args[0];
-        String testDataFile = args[1];
+		String testDataFile = args[1];
+		logFileLocation = args[2];
 		String ip = "localhost";
-		if (args.length > 2) {
-			ip = args[2];
+		if (args.length > 3) {
+			ip = args[3];
 		}
         boolean waitOnManualInput = false;
 
@@ -92,9 +99,48 @@ if (args.length < 2) {
                 System.in.read();
             }
 
+			UtpSocketChannel chanel = UtpSocketChannel.open();
+			int bytesToSend = buffer.position();
+
+			if (waitOnManualInput) {
+				System.out.println("Press any key to continue...");
+				System.in.read();
+			}
+
 //			UtpConnectFuture cFuture = chanel.connect(new InetSocketAddress("192.168.1.40", 13344));
             UtpConnectFuture cFuture = chanel.connect(new InetSocketAddress(ip, 13344));
 //			UtpConnectFuture cFuture = chanel.connect(new InetSocketAddress("192.168.1.44", 13344));
+
+			cFuture.block();
+			if (cFuture.isSuccessfull()) {
+				long start = timeStamper.timeStamp();
+				UtpWriteFuture writeFuture = chanel.write(buffer);
+				writeFuture.block();
+				if (!writeFuture.isSuccessfull()) {
+					plan.failed();
+					log.debug("FAILED");
+				} else {
+					String logEntry = testRunLogEntry + " -- " + calculateRate(bytesToSend, start, timeStamper.timeStamp());
+					logEntry += getCpuLoad(cpuLoad);
+					log.debug(logEntry);
+					writeEntry(logEntry + "\n");
+				}
+				log.debug("writing test done");
+			} else {
+				log.debug("FAILED");
+				plan.failed();
+			}
+			file.close();
+			fileChannel.close();
+			chanel.close();
+			buffer.clear();
+			cpuLoad.reset();
+			Thread.sleep(1000);
+
+		}
+		closeLog();
+		executor.shutdown();
+	}
 
             cFuture.block();
             if (cFuture.isSuccessfull()) {
@@ -122,10 +168,15 @@ if (args.length < 2) {
             cpuLoad.reset();
             Thread.sleep(1000);
 
-        }
-        closeLog();
-        executor.shutdown();
-    }
+	/* LOGGING methods	 */
+	private static void closeLog() throws IOException {
+		if (aFile != null) {
+			aFile.close();
+		}
+		if (fChannel != null) {
+			fChannel.close();
+		}
+	}
 
     /* CPU */
     private static String getCpuLoad(CpuLoadMeasure cpuLoad) {
@@ -144,32 +195,18 @@ if (args.length < 2) {
         }
     }
 
-    private static void writeEntry(String entry) {
-        ByteBuffer bbuffer = ByteBuffer.allocate(entry.getBytes().length + 10);
-        bbuffer.put(entry.getBytes());
+	private static void openLog() throws IOException {
+		aFile = new RandomAccessFile(logFileLocation, "rw");
+		fChannel = aFile.getChannel();
+		fChannel.truncate(0);
+	}
 
-        bbuffer.flip();
-        while (bbuffer.hasRemaining()) {
-            try {
-                fChannel.write(bbuffer);
-            } catch (IOException e) {
-                System.err.println("COULD NOT WRITE: " + entry);
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private static void openLog() throws IOException {
-        aFile = new RandomAccessFile("testData/auto/AutoTestLog.txt", "rw");
-        fChannel = aFile.getChannel();
-        fChannel.truncate(0);
-    }
-
-    /* Transmission Rate calculus */
-    private static String calculateRate(int bytesToSend, long start, long end) {
-        double seconds = (double)(end - start) / 1000000d;
-        double sendRate = ((double)bytesToSend / 1024d)/seconds;
-        return Math.round(sendRate) + "kB/sec";
+	/* Transmission Rate calculus */
+	private static String calculateRate(int bytesToSend, long start, long end) {
+		System.out.println("s: " + start + " e: " + end + " " + " bytes:" + bytesToSend);
+		double seconds = (double)(end - start)/1000000d;
+		double sendRate = ((double)bytesToSend/1024d)/seconds;
+		return Math.round(sendRate) + "kB/sec";
 	}
 
 	/* Send test plan configuration to receiving party in benchmark */

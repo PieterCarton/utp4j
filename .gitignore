@@ -2,5 +2,6 @@
 /target
 /codecover
 /testData/auto
+/benchmarking/testData/auto
 .idea
 utp4j.iml
