@@ -1,6 +1,7 @@
 /bin
 /target
 /codecover
+/.idea
 /testData/auto
 /benchmarking/testData/auto
 .idea
