@@ -35,7 +35,11 @@ test {
 group = 'utp4j'
 version = '0.0.2-SNAPSHOT'
 description = 'Micro Transport Protocol for Java'
-java.sourceCompatibility = JavaVersion.VERSION_17
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 publishing {
     publications {
