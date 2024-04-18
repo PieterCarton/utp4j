@@ -14,7 +14,6 @@
  */
 package net.utp4j.examples.configtest;
 
-import java.io.FileNotFoundException;
 import net.utp4j.channels.UtpSocketChannel;
 import net.utp4j.channels.futures.UtpConnectFuture;
 import net.utp4j.channels.futures.UtpWriteFuture;
@@ -99,14 +98,6 @@ public class ConfigTestWrite {
                 System.in.read();
             }
 
-			UtpSocketChannel chanel = UtpSocketChannel.open();
-			int bytesToSend = buffer.position();
-
-			if (waitOnManualInput) {
-				System.out.println("Press any key to continue...");
-				System.in.read();
-			}
-
 //			UtpConnectFuture cFuture = chanel.connect(new InetSocketAddress("192.168.1.40", 13344));
             UtpConnectFuture cFuture = chanel.connect(new InetSocketAddress(ip, 13344));
 //			UtpConnectFuture cFuture = chanel.connect(new InetSocketAddress("192.168.1.44", 13344));
@@ -142,41 +133,6 @@ public class ConfigTestWrite {
 		executor.shutdown();
 	}
 
-            cFuture.block();
-            if (cFuture.isSuccessfull()) {
-                long start = timeStamper.timeStamp();
-                UtpWriteFuture writeFuture = chanel.write(buffer);
-                writeFuture.block();
-                if (!writeFuture.isSuccessfull()) {
-                    plan.failed();
-                    log.debug("FAILED");
-                } else {
-                    String logEntry = testRunLogEntry + " -- " + calculateRate(bytesToSend, start, timeStamper.timeStamp());
-                    logEntry += getCpuLoad(cpuLoad);
-                    log.debug(logEntry);
-                    writeEntry(logEntry + "\n");
-                }
-                log.debug("writing test done");
-            } else {
-                log.debug("FAILED");
-                plan.failed();
-            }
-            file.close();
-            fileChannel.close();
-            chanel.close();
-            buffer.clear();
-            cpuLoad.reset();
-            Thread.sleep(1000);
-
-	/* LOGGING methods	 */
-	private static void closeLog() throws IOException {
-		if (aFile != null) {
-			aFile.close();
-		}
-		if (fChannel != null) {
-			fChannel.close();
-		}
-	}
 
     /* CPU */
     private static String getCpuLoad(CpuLoadMeasure cpuLoad) {
@@ -194,6 +150,21 @@ public class ConfigTestWrite {
             fChannel.close();
         }
     }
+
+	private static void writeEntry(String entry) {
+		ByteBuffer bbuffer = ByteBuffer.allocate(entry.getBytes().length + 10);
+		bbuffer.put(entry.getBytes());
+
+		bbuffer.flip();
+		while (bbuffer.hasRemaining()) {
+			try {
+				fChannel.write(bbuffer);
+			} catch (IOException e) {
+				System.err.println("COULD NOT WRITE: " + entry);
+				e.printStackTrace();
+			}
+		}
+	}
 
 	private static void openLog() throws IOException {
 		aFile = new RandomAccessFile(logFileLocation, "rw");
