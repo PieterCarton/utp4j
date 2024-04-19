@@ -48,3 +48,8 @@ This repository contains a number of pre-made UTP4J benchmark test configuration
 - *pkt_size_benchmark.csv*: Test UTP configurations with varying packet sizes (MAX_PKT_SIZE, MIN_PKT_SIZE) and packet size modes (PKT_SIZE_MODE).
 - *congestion_window_increase_benchmark.csv*: Test UTP configurations with the maximum congestion window varying from 3 kB to 600 kB.
 - *skip_packets_until_ack_benchmark.csv*: Test UTP configurations with differing selective acknowledgement parameters.
+
+# Current shortcomings and Room for future improvement
+Establishing multiple simultaneous connections is not easily possible in current version of the library. It requires implementing a custom `DatagramSocket` to distribute received packets between different `UtpReceiveRunnable` instances, as each runnable requires their own socket and normal datagram sockets cannot be shared. Implementing a native way of maintianing multiple connections would greatly increase the utility this library provides.
+
+It is also worth noting that the current default parameters for UTP4J perhaps not optimal. Benchmarks were performed on a local computer with network emulation, which suggested that the maximum speed at which the congestion window can increase is vital for good performance, and could be set 10x higher than the default setting. However, these improvement were not seen when using UTP4j over the internet. More suitable UTP algorithm parameters could perhaps be found by taking into consideration modern hardware under modern network conditions and doing benchmarking in a more realistic setting.
