@@ -4,11 +4,10 @@ This fork contains a number of contributions to the utp4j library, originally de
 - expanded the functionality and fixing of small bugs of existing `configTestRead.java` and `configTestWrite.java`:
     - corrected transfer speed calculations
     - exposed more utp algorithm parameters to be changes is the testPlan
-- expanded test suite for `LEDBAT` congestion control mechanism
-- added a test script to easily benchmark utp4j performance locally with network emulation, to simulate realistic network behaviour
+- expanded test suite for `LEDBAT` congestion control mechanism (see [PacketTimeoutTest](src/test/java/net/utp4j/channels/impl/alg/PacketTimeoutTest.java), [LatencyFactorTest](src/test/java/net/utp4j/channels/impl/alg/LatencyFactorTest.java))
+- added a test script to easily benchmark utp4j performance locally with network emulation, to simulate realistic network behaviour (see benchmarking directory)
 - added more test configurations for benchmarking different values of UTP parameters
-- added a script for converting benchmark data to a neat table in excel
-- minor improvements in readibility of source code
+- minor improvements in readibility of source code, mainly in [UtpAlgorithm.java](src/main/java/net/utp4j/channels/impl/alg/UtpAlgorithm.java)
 
 ## Benchmarking
 The benchmarking directory now contains a WIP script for benchmarking UTP4j performance
