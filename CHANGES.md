@@ -52,4 +52,13 @@ This repository contains a number of pre-made UTP4J benchmark test configuration
 # Current shortcomings and Room for future improvement
 Establishing multiple simultaneous connections is not easily possible in current version of the library. It requires implementing a custom `DatagramSocket` to distribute received packets between different `UtpReceiveRunnable` instances, as each runnable requires their own socket and normal datagram sockets cannot be shared. Implementing a native way of maintianing multiple connections would greatly increase the utility this library provides.
 
-It is also worth noting that the current default parameters for UTP4J perhaps not optimal. Benchmarks were performed on a local computer with network emulation, which suggested that the maximum speed at which the congestion window can increase is vital for good performance, and could be set 10x higher than the default setting. However, these improvement were not seen when using UTP4j over the internet. More suitable UTP algorithm parameters could perhaps be found by taking into consideration modern hardware under modern network conditions and doing benchmarking in a more realistic setting.
+It is also worth noting that the current default parameters for UTP4J perhaps not optimal. Benchmarks were performed on a local computer with network emulation, which suggested that the maximum speed at which the congestion window can increase is vital for good performance, and could be set 10x higher than the default setting. However, more suitable UTP algorithm parameters could perhaps be found by taking into consideration modern hardware under modern network conditions and doing benchmarking in a more realistic setting.
+
+# SEE ALSO
+| Name | Link |
+| :-: | :-: |
+|  Main project issue   |  https://github.com/Tribler/tribler/issues/7911  |
+| Main app description | https://github.com/Eragoneq/trustchain-superapp/blob/master/doc/BlockchainNetworkingProject/UtpTesting.md |
+| Benchmarking done over 10 weeks | https://github.com/Eragoneq/trustchain-superapp/blob/master/doc/BlockchainNetworkingProject/Benchmarking.md |
+| utp4j changes and benchmarks | https://github.com/PieterCarton/utp4j/blob/master/CHANGES.md |
+| kotlin-ipv8 changes | https://github.com/Eragoneq/kotlin-ipv8/blob/master/doc/UtpBinaryTransfer.md |
